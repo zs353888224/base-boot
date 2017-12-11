@@ -62,14 +62,10 @@ task mybatisGenerate << {
     ant.properties['password'] = properties.getProperty("jdbc.pass")
     ant.properties['sqlMapperPackage'] = properties.getProperty("sqlMapperPackage")
     ant.properties['modelPackage'] = properties.getProperty("modelPackage")
+    ant.properties['mapperPackage'] = properties.getProperty("mapperPackage")
 
-    ant.properties['commonMapperPackage'] = properties.getProperty("mapper.package.common")
     ant.properties['commonClassNamePrefix'] = properties.getProperty("common.className.prefix")
-
-    ant.properties['appMapperPackage'] = properties.getProperty("mapper.package.app")
     ant.properties['appTargetProject'] = properties.getProperty("targetProject.app")
-
-    ant.properties['adminMapperPackage'] = properties.getProperty("mapper.package.admin")
     ant.properties['adminTargetProject'] = properties.getProperty("targetProject.admin")
 
     ant.properties['src_main_java'] = sourceSets.main.java.srcDirs[0].path
@@ -93,7 +89,6 @@ task mybatisGenerate << {
 
     ant.mbgeneratorApp (overwrite: true,
             configfile: 'src/main/resources/generatorConfig.xml', verbose: true) {
-        ant.properties['mapperPackage'] = ant.properties['appMapperPackage']
         ant.properties['projectTargetProject'] = ant.properties['appTargetProject']
         ant.properties['classNamePrefix'] = ''
         propertyset {
@@ -114,7 +109,6 @@ task mybatisGenerate << {
 
     ant.mbgeneratorAdmin (overwrite: true,
             configfile: 'src/main/resources/generatorConfig.xml', verbose: true) {
-        ant.properties['mapperPackage'] = ant.properties['adminMapperPackage']
         ant.properties['projectTargetProject'] = ant.properties['adminTargetProject']
         ant.properties['classNamePrefix'] = ''
         propertyset {
@@ -135,7 +129,6 @@ task mybatisGenerate << {
 
     ant.mbgeneratorCommon (overwrite: true,
             configfile: 'src/main/resources/generatorConfig.xml', verbose: true) {
-        ant.properties['mapperPackage'] = ant.properties['commonMapperPackage']
         ant.properties['projectTargetProject'] = ''
         ant.properties['classNamePrefix'] = ant.properties['commonClassNamePrefix']
         propertyset {
