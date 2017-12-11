@@ -1,0 +1,22 @@
+description = 'env of project'
+
+task copyConf {
+    doFirst {
+        def p = "local"
+        if (project.hasProperty("profile")) {
+            p = "${profile}"
+        }
+        copy {
+            from('src/main/conf/' + p)
+            into('build/resources/main')
+        }
+        copy {
+            from('src/main/conf/' + p)
+            into('build/resources/test')
+        }
+    }
+}
+
+gradle.projectsEvaluated {
+    classes.dependsOn(copyConf)
+}
