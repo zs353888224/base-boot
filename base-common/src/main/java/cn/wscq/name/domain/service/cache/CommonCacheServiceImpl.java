@@ -10,11 +10,13 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author shuai
  * @version 1.0
- * @description
+ * @description 对redis的初级应用，实现增删改的功能
  * @date 2017/12/8 14:51
  */
 @Service
 public class CommonCacheServiceImpl implements CommonCacheService {
+
+    // TODO 添加日志打印
 
     @Autowired
     private StringRedisTemplate redisTemplate;
@@ -46,12 +48,10 @@ public class CommonCacheServiceImpl implements CommonCacheService {
         return redisTemplate.opsForValue().get(key);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> T getObject(String key, Class<T> clazz) {
         String value = this.getString(key);
-        Object obj = JSON.parseObject(value, clazz);
-        return (T) obj;
+        return JSON.parseObject(value, clazz);
     }
 
     @Override

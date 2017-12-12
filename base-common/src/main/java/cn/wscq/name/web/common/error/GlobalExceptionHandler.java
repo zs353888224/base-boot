@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * @author shuai
  * @version 1.0
@@ -30,11 +28,32 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Autowired
     private MessageSource messageSource;
 
+    /**
+     * 捕捉业务异常
+     *
+     * @param e
+     * @return
+     */
     @ExceptionHandler(BusinessException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public APIResult handleGlobalException(HttpServletRequest request, BusinessException ex) {
-        logger.error(ex.getMessage());
-        return APIResult.failure().setMessage(messageSource.getMessage(ex.getCode(), ex.getArgs(), LocaleContextHolder.getLocale()));
+    public APIResult handleBusinessException(BusinessException e) {
+        logger.error(e.getMessage());
+        return APIResult.failure().setMessage(messageSource.getMessage(e.getCode(), e.getArgs(), LocaleContextHolder.getLocale()));
+    }
+
+    /**
+     * 捕捉全局异常
+     *
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(Exception.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public APIResult handleGlobalException(Exception e) {
+        logger.error(e.getMessage());
+        logger.error("error:", e);
+        return APIResult.failure().setMessage(e.getMessage());
     }
 }

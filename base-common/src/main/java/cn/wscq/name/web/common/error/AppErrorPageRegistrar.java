@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author shuai
  * @version 1.0
- * @description
+ * @description 处理系统之外的错误
  * @date 2017/12/11 16:09
  */
 @Component
