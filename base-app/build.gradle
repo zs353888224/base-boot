@@ -17,6 +17,4 @@ apply plugin: 'io.spring.dependency-management'
 
 dependencies {
     compile project(':base-common')
-    compile project(':base-db')
-    compile project(':base-env')
 }

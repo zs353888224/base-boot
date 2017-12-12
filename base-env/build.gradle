@@ -1,14 +1,24 @@
 description = 'env of project'
+def profile = 'local'
+
+sourceSets {
+    main {
+        resources {
+            srcDir("src/main/conf/" + profile)
+        }
+    }
+    test {
+        resources {
+            srcDir("src/main/conf/" + profile)
+        }
+    }
+}
 
 task copyConf {
     doFirst {
-        def p = "local"
-        if (project.hasProperty("profile")) {
-            p = "${profile}"
-        }
-        copy {
-            from('src/main/conf/' + p)
-            into('build/resources/main')
+        def p = profile
+        if (project.hasProperty("env")) {
+            p = "${env}"
         }
         copy {
             from('src/main/conf/' + p)
