@@ -9,5 +9,5 @@ cache:
 jdk:
   - oraclejdk8
 services:
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS base-boot;'
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS base-boot DEFAULT CHARSET utf8 COLLATE utf8_bin;'
   - redis-server --port 6379 --requirepass 'root'
