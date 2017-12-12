@@ -7,4 +7,7 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 jdk:
-  - oraclejdk9
+  - oraclejdk8
+services:
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS base-boot;'
+  - redis-server --port 6379 --requirepass 'root'

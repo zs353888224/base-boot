@@ -19,6 +19,8 @@ configurations {
 }
 
 dependencies {
+    compile project(':base-env')
+    compile project(':base-db')
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-security')
     compile("org.springframework.boot:spring-boot-starter-aop")
