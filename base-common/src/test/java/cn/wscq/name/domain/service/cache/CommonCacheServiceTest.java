@@ -26,6 +26,9 @@ public class CommonCacheServiceTest implements BaseTest{
     @Test
     public void saveString() {
         System.out.println("test");
+        System.out.println("dsada");
+        System.out.println("dsadadasda");
+        System.out.println("dsada");
     }
 
     @Test
