@@ -19,6 +19,8 @@ configurations {
 }
 
 dependencies {
+    compile project(':base-env')
+    compile project(':base-db')
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-security')
     compile("org.springframework.boot:spring-boot-starter-aop")
@@ -26,19 +28,20 @@ dependencies {
     compile("org.springframework.boot:spring-boot-autoconfigure")
     compile("org.springframework.boot:spring-boot-configuration-processor")
     compile("org.springframework.session:spring-session-data-redis")
-    compile("mysql:mysql-connector-java")
     compile("org.flywaydb:flyway-core")
+    compile("mysql:mysql-connector-java")
 
     compile("org.mybatis.spring.boot:mybatis-spring-boot-starter:1.3.1")
     compile("com.github.pagehelper:pagehelper-spring-boot-starter:1.2.3")
 
-    compile("org.apache.httpcomponents:httpclient:4.5.4")
     compile("com.alibaba:fastjson:1.2.41")
+    compile("com.google.zxing:core:3.2.1")
+    compile("org.apache.httpcomponents:httpclient:4.5.4")
     compile("joda-time:joda-time:2.9.9")
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
-    testCompile('org.springframework.security:spring-security-test')
     testCompile("org.springframework.boot:spring-boot-test-autoconfigure")
+    testCompile('org.springframework.security:spring-security-test')
 
     mybatisGenerator 'org.mybatis.generator:mybatis-generator-core:1.3.5'
     mybatisGenerator 'mysql:mysql-connector-java:5.1.45'
@@ -53,104 +56,99 @@ def getDbProperties = {
     properties
 }
 
-task mybatisGenerate << {
-    def properties = getDbProperties()
-    ant.properties['targetProject'] = projectDir.path
-    ant.properties['driverClass'] = properties.getProperty("jdbc.driverClassName")
-    ant.properties['connectionURL'] = properties.getProperty("jdbc.url")
-    ant.properties['userId'] = properties.getProperty("jdbc.user")
-    ant.properties['password'] = properties.getProperty("jdbc.pass")
-    ant.properties['sqlMapperPackage'] = properties.getProperty("sqlMapperPackage")
-    ant.properties['modelPackage'] = properties.getProperty("modelPackage")
+task mybatisGenerate {
+    doLast {
+        def properties = getDbProperties()
+        ant.properties['targetProject'] = projectDir.path
+        ant.properties['driverClass'] = properties.getProperty("jdbc.driverClassName")
+        ant.properties['connectionURL'] = properties.getProperty("jdbc.url")
+        ant.properties['userId'] = properties.getProperty("jdbc.user")
+        ant.properties['password'] = properties.getProperty("jdbc.pass")
+        ant.properties['sqlMapperPackage'] = properties.getProperty("sqlMapperPackage")
+        ant.properties['modelPackage'] = properties.getProperty("modelPackage")
+        ant.properties['mapperPackage'] = properties.getProperty("mapperPackage")
 
-    ant.properties['commonMapperPackage'] = properties.getProperty("mapper.package.common")
-    ant.properties['commonClassNamePrefix'] = properties.getProperty("common.className.prefix")
+        ant.properties['commonClassNamePrefix'] = properties.getProperty("common.className.prefix")
+        ant.properties['appTargetProject'] = properties.getProperty("targetProject.app")
+        ant.properties['adminTargetProject'] = properties.getProperty("targetProject.admin")
 
-    ant.properties['appMapperPackage'] = properties.getProperty("mapper.package.app")
-    ant.properties['appTargetProject'] = properties.getProperty("targetProject.app")
+        ant.properties['src_main_java'] = sourceSets.main.java.srcDirs[0].path
+        ant.properties['src_main_resources'] = sourceSets.main.resources.srcDirs[0].path
 
-    ant.properties['adminMapperPackage'] = properties.getProperty("mapper.package.admin")
-    ant.properties['adminTargetProject'] = properties.getProperty("targetProject.admin")
+        ant.taskdef(
+                name: 'mbgeneratorCommon',
+                classname: 'org.mybatis.generator.ant.GeneratorAntTask',
+                classpath: configurations.mybatisGenerator.asPath
+        )
+        ant.taskdef(
+                name: 'mbgeneratorApp',
+                classname: 'org.mybatis.generator.ant.GeneratorAntTask',
+                classpath: configurations.mybatisGenerator.asPath
+        )
+        ant.taskdef(
+                name: 'mbgeneratorAdmin',
+                classname: 'org.mybatis.generator.ant.GeneratorAntTask',
+                classpath: configurations.mybatisGenerator.asPath
+        )
 
-    ant.properties['src_main_java'] = sourceSets.main.java.srcDirs[0].path
-    ant.properties['src_main_resources'] = sourceSets.main.resources.srcDirs[0].path
+        ant.mbgeneratorApp(overwrite: true,
+                configfile: 'src/main/resources/generatorConfig.xml', verbose: true) {
+            ant.properties['projectTargetProject'] = ant.properties['appTargetProject']
+            ant.properties['classNamePrefix'] = ''
+            propertyset {
+                propertyref(name: 'userId')
+                propertyref(name: 'driverClass')
+                propertyref(name: 'connectionURL')
+                propertyref(name: 'password')
 
-    ant.taskdef(
-            name: 'mbgeneratorCommon',
-            classname: 'org.mybatis.generator.ant.GeneratorAntTask',
-            classpath: configurations.mybatisGenerator.asPath
-    )
-    ant.taskdef(
-            name: 'mbgeneratorApp',
-            classname: 'org.mybatis.generator.ant.GeneratorAntTask',
-            classpath: configurations.mybatisGenerator.asPath
-    )
-    ant.taskdef(
-            name: 'mbgeneratorAdmin',
-            classname: 'org.mybatis.generator.ant.GeneratorAntTask',
-            classpath: configurations.mybatisGenerator.asPath
-    )
+                propertyref(name: 'sqlMapperPackage')
 
-    ant.mbgeneratorApp (overwrite: true,
-            configfile: 'src/main/resources/generatorConfig.xml', verbose: true) {
-        ant.properties['mapperPackage'] = ant.properties['appMapperPackage']
-        ant.properties['projectTargetProject'] = ant.properties['appTargetProject']
-        ant.properties['classNamePrefix'] = ''
-        propertyset {
-            propertyref(name: 'userId')
-            propertyref(name: 'driverClass')
-            propertyref(name: 'connectionURL')
-            propertyref(name: 'password')
+                propertyref(name: 'modelPackage')
+                propertyref(name: 'mapperPackage')
 
-            propertyref(name: 'sqlMapperPackage')
-
-            propertyref(name: 'modelPackage')
-            propertyref(name: 'mapperPackage')
-
-            propertyref(name: 'projectTargetProject')
-            propertyref(name: 'classNamePrefix')
+                propertyref(name: 'projectTargetProject')
+                propertyref(name: 'classNamePrefix')
+            }
         }
-    }
 
-    ant.mbgeneratorAdmin (overwrite: true,
-            configfile: 'src/main/resources/generatorConfig.xml', verbose: true) {
-        ant.properties['mapperPackage'] = ant.properties['adminMapperPackage']
-        ant.properties['projectTargetProject'] = ant.properties['adminTargetProject']
-        ant.properties['classNamePrefix'] = ''
-        propertyset {
-            propertyref(name: 'userId')
-            propertyref(name: 'driverClass')
-            propertyref(name: 'connectionURL')
-            propertyref(name: 'password')
+        ant.mbgeneratorAdmin(overwrite: true,
+                configfile: 'src/main/resources/generatorConfig.xml', verbose: true) {
+            ant.properties['projectTargetProject'] = ant.properties['adminTargetProject']
+            ant.properties['classNamePrefix'] = ''
+            propertyset {
+                propertyref(name: 'userId')
+                propertyref(name: 'driverClass')
+                propertyref(name: 'connectionURL')
+                propertyref(name: 'password')
 
-            propertyref(name: 'sqlMapperPackage')
+                propertyref(name: 'sqlMapperPackage')
 
-            propertyref(name: 'modelPackage')
-            propertyref(name: 'mapperPackage')
+                propertyref(name: 'modelPackage')
+                propertyref(name: 'mapperPackage')
 
-            propertyref(name: 'projectTargetProject')
-            propertyref(name: 'classNamePrefix')
+                propertyref(name: 'projectTargetProject')
+                propertyref(name: 'classNamePrefix')
+            }
         }
-    }
 
-    ant.mbgeneratorCommon (overwrite: true,
-            configfile: 'src/main/resources/generatorConfig.xml', verbose: true) {
-        ant.properties['mapperPackage'] = ant.properties['commonMapperPackage']
-        ant.properties['projectTargetProject'] = ''
-        ant.properties['classNamePrefix'] = ant.properties['commonClassNamePrefix']
-        propertyset {
-            propertyref(name: 'userId')
-            propertyref(name: 'driverClass')
-            propertyref(name: 'connectionURL')
-            propertyref(name: 'password')
+        ant.mbgeneratorCommon(overwrite: true,
+                configfile: 'src/main/resources/generatorConfig.xml', verbose: true) {
+            ant.properties['projectTargetProject'] = ''
+            ant.properties['classNamePrefix'] = ant.properties['commonClassNamePrefix']
+            propertyset {
+                propertyref(name: 'userId')
+                propertyref(name: 'driverClass')
+                propertyref(name: 'connectionURL')
+                propertyref(name: 'password')
 
-            propertyref(name: 'sqlMapperPackage')
+                propertyref(name: 'sqlMapperPackage')
 
-            propertyref(name: 'modelPackage')
-            propertyref(name: 'mapperPackage')
+                propertyref(name: 'modelPackage')
+                propertyref(name: 'mapperPackage')
 
-            propertyref(name: 'projectTargetProject')
-            propertyref(name: 'classNamePrefix')
+                propertyref(name: 'projectTargetProject')
+                propertyref(name: 'classNamePrefix')
+            }
         }
     }
 }

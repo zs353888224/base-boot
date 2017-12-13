@@ -9,6 +9,7 @@ allprojects {
 
 ext {
     springBootVersion = '1.5.9.RELEASE'
+    profile = 'local'
 }
 
 subprojects {
@@ -18,8 +19,15 @@ subprojects {
     targetCompatibility = 1.8
     compileJava.options.encoding = 'UTF-8'
 
+    idea {
+        module {
+            inheritOutputDirs = false
+            outputDir = file("$buildDir/classes/main/")
+            testOutputDir = file("$buildDir/classes/test/")
+        }
+    }
+
     repositories {
-        mavenLocal()
         mavenCentral()
         maven { url "https://repo.spring.io/snapshot" }
         maven { url "https://repo.spring.io/milestone" }
