@@ -18,3 +18,5 @@ test:
   encoding: utf8
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS base_boot DEFAULT CHARSET utf8 COLLATE utf8_bin;'
+before_script:
+  - echo "USE mysql;\nUPDATE user SET password=PASSWORD('123456') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
