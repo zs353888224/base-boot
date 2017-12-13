@@ -2,6 +2,7 @@ package cn.wscq.name.domain.service.cache;
 
 import cn.wscq.name.BaseTest;
 import cn.wscq.name.MyTestsConfiguration;
+import cn.wscq.name.domain.dao.mybatis.CommonTTestMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +24,17 @@ public class CommonCacheServiceTest implements BaseTest{
     @Autowired
     private CommonCacheService commonCacheService;
 
+    @Autowired
+    private CommonTTestMapper commonTTestMapper;
+
     @Test
     public void saveString() {
+        commonTTestMapper.selectByPrimaryKey(1L);
         System.out.println("test");
+        System.out.println("dsada");
+        System.out.println("dsadadasda");
+        System.out.println("dsada");
+        System.out.println("dsada");
     }
 
     @Test
