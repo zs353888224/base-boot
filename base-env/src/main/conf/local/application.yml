@@ -14,7 +14,7 @@ spring:
       basename: i18n/messages
 mybatis:
     mapperLocations: classpath:mappers/*.xml
-    type-handlers-package: cn.wscq.name.domain.dao.mybatis
+    type-handlers-package: cn.wscq.name.domain.dao.mybatis.*
     type-aliases-package: cn.wscq.name.domain.model.mybatis
 pagehelper:
     helper-dialect: mysql
